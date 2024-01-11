@@ -1,0 +1,14 @@
+[package]
+name = "scrape_apply"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4.4.12", features = ["derive"] }
+csv = "1.3.0"
+lettre = { version = "0.11.3", features = ["builder"] }
+serde = { version = "1.0.194", features = ["derive"] }
+"thirtyfour" = {version = "0.31.0"}
+"tokio" = "1.26.0"
