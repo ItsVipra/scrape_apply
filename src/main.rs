@@ -174,6 +174,8 @@ async fn stagger_emails(input_path: &String, smtp_url: &str, smtp_user: &str, sm
             Err(_) => print!("x")
         };
 
+        std::io::stdout().flush().unwrap();
+
         //sleep after sending each email as not to trip rate limits
         tokio::time::sleep(delay).await;
     }
