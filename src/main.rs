@@ -134,7 +134,8 @@ async fn stagger_emails(input_path: &String, smtp_url: &str, smtp_user: &str, sm
     for result in reader.deserialize() {
         let record: (String, String, String) = result?;
         //don't push records with empty email fields
-        if !record.2.is_empty() {
+        //or empty name fields
+        if !record.2.is_empty() && !record.1.is_empty() {
             targets.push(record);
         }
     }
