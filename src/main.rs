@@ -1,11 +1,13 @@
-use std::cmp::max;
+use std::cmp::min;
 use std::fs;
+use std::io::Write;
+use std::ops::{RangeInclusive};
 use std::time::Duration;
 use thirtyfour::prelude::*;
 use clap::{Parser, Subcommand};
 use lettre::{Message, SmtpTransport, Transport, transport::smtp};
 use lettre::message::{Body, header};
-
+use rand::{thread_rng, Rng};
 
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -163,7 +165,7 @@ async fn stagger_emails(input_path: &String, smtp_url: &str, smtp_user: &str, sm
     for (i, target) in targets.iter().enumerate() {
         let delay= Duration::from_secs(rng.gen_range(DELAY_RANGE));
         if i % 10 == 0 {
-            print!("[{}-{}]", i, max(i+9, targets.len()));
+            print!("[{}-{}]", i, min(i+9, targets.len()));
         }
 
         match send_email(target, smtp_url, smtp_user, smtp_pass, &message).await {
