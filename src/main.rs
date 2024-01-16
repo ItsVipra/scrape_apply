@@ -147,7 +147,8 @@ async fn stagger_emails(input_path: &String, smtp_url: &str, smtp_user: &str, sm
 
     let message = fs::read_to_string(message).expect("unable to read message file");
 
-    const DELAY: Duration = Duration::from_secs(10);
+    const DELAY_RANGE: RangeInclusive<u64> = 60..=600;
+    let mut rng = thread_rng();
     println!("Preparing to send E-Mails to {} targets.", targets.len());
     //ensure the machine doesn't turn off while waiting to send emails
     let _awake = keepawake::Builder::new()
@@ -157,9 +158,10 @@ async fn stagger_emails(input_path: &String, smtp_url: &str, smtp_user: &str, sm
         .create().expect("Failed to build keepawake");
 
 
-    println!("Delay between emails: {:?} - ETA: {:?}", DELAY_RANGE, Duration::from_secs(DELAY_RANGE.nth(DELAY_RANGE.count()/2).expect("range machine broke") * targets.len() as u64));
+    println!("Delay between emails: {:?} - ETA: {:?}", DELAY_RANGE, Duration::from_secs(DELAY_RANGE.nth(DELAY_RANGE.count()/2).expect("Failed to get middle of range") * targets.len() as u64));
     let mut success_count = 0;
     for (i, target) in targets.iter().enumerate() {
+        let delay= Duration::from_secs(rng.gen_range(DELAY_RANGE));
         if i % 10 == 0 {
             print!("[{}-{}]", i, max(i+9, targets.len()));
         }
@@ -173,7 +175,7 @@ async fn stagger_emails(input_path: &String, smtp_url: &str, smtp_user: &str, sm
         };
 
         //sleep after sending each email as not to trip rate limits
-        tokio::time::sleep(DELAY).await;
+        tokio::time::sleep(delay).await;
     }
 
     println!();
