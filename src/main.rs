@@ -149,7 +149,15 @@ async fn stagger_emails(input_path: &String, smtp_url: &str, smtp_user: &str, sm
 
     const DELAY: Duration = Duration::from_secs(10);
     println!("Preparing to send E-Mails to {} targets.", targets.len());
-    println!("Delay between emails: {:?} - ETA: {:?}", DELAY, DELAY* targets.len() as u32);
+    //ensure the machine doesn't turn off while waiting to send emails
+    let _awake = keepawake::Builder::new()
+        .idle(true)
+        .reason("Sending emails")
+        .app_name("scrape_apply")
+        .create().expect("Failed to build keepawake");
+
+
+    println!("Delay between emails: {:?} - ETA: {:?}", DELAY_RANGE, Duration::from_secs(DELAY_RANGE.nth(DELAY_RANGE.count()/2).expect("range machine broke") * targets.len() as u64));
     let mut success_count = 0;
     for (i, target) in targets.iter().enumerate() {
         if i % 10 == 0 {
